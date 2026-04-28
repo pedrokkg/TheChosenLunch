@@ -1,0 +1,26 @@
+// data.js
+const refeicoesPreDefinidas = [
+    "Frango grelhado com arroz.",
+    "Panqueca de Frango",
+    "Bife, arroz e batata frita",
+    "Macarrão com molho de tomate",
+    "Escondidinho de batata com carne moída",
+    "Macarrão estilo Spoleto",
+    "Macarrão com molho branco",
+    "Strogonoff de Frango",
+    "Lasanha",
+    "Arroz, feijão, purê de batata e carne moída",
+    "Bife, arroz e bolinho de batata",
+    "Frango com creme de milho",
+    "Fricassê de Frango",
+    "Arroz, feijão, farofa e linguiça",
+    "Bife, arroz e batata frita",
+    "Arroz de brócolis com carne",
+    "Arroz à piemontese com carne",
+    "Frango de padaria com arroz e farofa",
+    "Batata Rostie",
+    "Nhoque à bolonhesa",
+    "Arroz de forno com carne, queijo e ervilha",
+    "Kibe de forno recheado com queijo",
+    "Hambúrguer caseiro com batatas"
+];

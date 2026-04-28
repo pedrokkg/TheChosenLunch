@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chosen Lunch</title>
+    
+    <link rel="icon" type="image/png" href="img/logo.png">
+    
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <header>
+    <img src="img/titulo.png" alt="The Chosen Lunch" class="titulo">
+    <img src="img/logo.png" alt="Logo Chef Bot" class="logo">
+</header>
+
+    <main>
+        <button id="btn-gerar" class="btn-primary">Gerar Receitas da Semana</button>
+
+        <div id="area-cardapio" class="escondido">
+            <div id="planilha-semana">
+                <div class="calendario-header">
+                    <h2>Cardápio da Semana</h2>
+                    <span id="periodo-semana"></span>
+                </div>
+                
+                <div class="grid-dias" id="grid-dias">
+                    </div>
+            </div>
+
+            <div class="acoes">
+                <button id="btn-imprimir" class="btn-secondary">🖨️ Imprimir</button>
+                <button id="btn-whatsapp" class="btn-whatsapp">💬 Enviar no WhatsApp</button>
+            </div>
+        </div>
+</main>
+
+    <footer>
+        <p>desenvolvido por @pedrokg</p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

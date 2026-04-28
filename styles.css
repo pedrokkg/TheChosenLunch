@@ -1,0 +1,266 @@
+:root {
+    --cor-fundo: #fdfaf6;
+    --cor-texto: #333;
+    --cor-primaria: #e07a5f;
+    --cor-secundaria: #81b29a;
+    --cor-whatsapp: #25d366;
+    --cor-card: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    /* Cor de fallback caso a imagem falhe */
+    background-color: #d15656; 
+    
+    /* === AQUI ESTÁ A CORREÇÃO IMPORTANTE === */
+    /* Garanta que o arquivo na pasta 'img' chama-se exatamente fundo.png */
+    background-image: url('img/fundo.png'); 
+    /* ======================================= */
+    
+    /* Faz a imagem se repetir como um padrão */
+    background-repeat: repeat;
+    
+    /* Deixa o fundo fixo enquanto rola a página */
+    background-attachment: fixed;
+    
+    color: var(--cor-texto);
+    text-align: center;
+    padding-bottom: 40px;
+    min-height: 100vh; /* Garante que o corpo ocupe a tela toda para mostrar o fundo */
+}
+
+/* Header com Título à Esquerda e Robô à Direita */
+header {
+    display: flex;
+    justify-content: space-between; /* Empurra um para cada lado */
+    align-items: center;            /* Alinha verticalmente no centro */
+    padding: 15px 5%;               /* Respiro nas laterais */
+    background-color: rgba(255, 255, 255, 0.95); /* Branco com leve transparência */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 80px; 
+    height: auto;
+}
+
+.titulo {
+    width: 220px; 
+    height: auto;
+}
+
+button {
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    margin: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.btn-primary {
+    background-color: var(--cor-primaria);
+    color: white;
+    width: 90%;
+    max-width: 400px;
+    font-size: 1.2rem;
+    padding: 18px;
+}
+
+.btn-secondary { background-color: var(--cor-secundaria); color: white; }
+.btn-whatsapp { background-color: var(--cor-whatsapp); color: white; }
+
+.escondido { display: none !important; }
+
+/* Visual de Calendário */
+#planilha-semana {
+    background-color: var(--cor-card);
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 30px 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.calendario-header {
+    margin-bottom: 25px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.calendario-header h2 {
+    color: var(--cor-texto);
+    font-size: 1.8rem;
+}
+
+#periodo-semana {
+    color: #666;
+    font-weight: 500;
+}
+
+.grid-dias {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.dia-card {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.dia-data {
+    background-color: var(--cor-secundaria);
+    color: white;
+    padding: 15px;
+    min-width: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dia-semana {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.dia-numero {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.dia-comida {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--cor-texto);
+    text-align: left;
+    flex: 1;
+}
+
+.acoes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+    .grid-dias {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dia-card:last-child {
+        grid-column: span 2;
+        max-width: 50%;
+        margin: 0 auto;
+    }
+}
+
+/* Celulares pequenos: empilha o header */
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
+    }
+}
+
+/* Esconder elementos na impressão */
+/* Configurações específicas para Impressão */
+@media print {
+    /* Força a orientação da folha para paisagem (horizontal) */
+    @page {
+        size: landscape;
+        margin: 10mm;
+    }
+
+    body { 
+        background: white !important; 
+        background-image: none !important; 
+        padding: 0;
+    }
+    
+    /* Esconde os botões */
+    #btn-gerar, .acoes { 
+        display: none !important; 
+    }
+    
+    /* Ajusta o Header (Título e Robô) para ocupar bem o topo horizontal */
+    header {
+        box-shadow: none !important;
+        background-color: transparent !important;
+        padding: 10px 0 !important;
+        margin-bottom: 15px !important;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #planilha-semana { 
+        box-shadow: none !important; 
+        margin: 0 !important; 
+        width: 100% !important; 
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+
+    /* O PULO DO GATO: Faz os 5 dias ficarem lado a lado na folha deitada */
+    .grid-dias {
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr) !important; /* 5 colunas iguais */
+        gap: 10px !important;
+    }
+
+    .dia-card {
+        flex-direction: column !important; /* Empilha a data em cima do nome da comida no card */
+        text-align: center !important;
+        border: 1px solid #ccc !important;
+        height: auto;
+    }
+
+    .dia-data {
+        min-width: 100% !important;
+        padding: 8px !important;
+    }
+
+    .dia-comida {
+        padding: 10px !important;
+        font-size: 0.95rem !important; /* Diminui um pouco a fonte para caber bem nas 5 colunas */
+        justify-content: center !important;
+        text-align: center !important;
+    }
+}
+
+/* Estilo do Rodapé */
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    color: #000000; /* Texto branco para destacar no fundo vermelho */
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Sombra leve para leitura */
+    opacity: 0.9;
+}
