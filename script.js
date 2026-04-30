@@ -1,3 +1,4 @@
+// script.js
 const btnGerar = document.getElementById('btn-gerar');
 const areaCardapio = document.getElementById('area-cardapio');
 const gridDias = document.getElementById('grid-dias');
@@ -7,12 +8,10 @@ const periodoSemana = document.getElementById('periodo-semana');
 
 const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 
-// Função para descobrir as datas de segunda a sexta da semana atual
+// Função para descobrir as datas da semana
 function obterDatasDaSemana() {
     const hoje = new Date();
-    const diaDaSemana = hoje.getDay(); // 0 (Dom) a 6 (Sáb)
-    
-    // Calcula a diferença para chegar na segunda-feira
+    const diaDaSemana = hoje.getDay(); 
     const diferencaParaSegunda = diaDaSemana === 0 ? 1 : -(diaDaSemana - 1);
     
     const segunda = new Date(hoje);
@@ -22,8 +21,6 @@ function obterDatasDaSemana() {
     for (let i = 0; i < 5; i++) {
         const diaAtual = new Date(segunda);
         diaAtual.setDate(segunda.getDate() + i);
-        
-        // Formata para DD/MM
         const diaStr = String(diaAtual.getDate()).padStart(2, '0');
         const mesStr = String(diaAtual.getMonth() + 1).padStart(2, '0');
         datas.push(`${diaStr}/${mesStr}`);
@@ -31,28 +28,45 @@ function obterDatasDaSemana() {
     return datas;
 }
 
-// Embaralha o array (garante que as refeições não se repitam nos mesmos dias)
-function embaralharArray(array) {
+// Função para embaralhar e pegar itens
+function pegarAleatorios(array, quantidade) {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return arr;
+    return arr.slice(0, quantidade);
 }
 
 btnGerar.addEventListener('click', () => {
     gridDias.innerHTML = '';
     
     const datasDaSemana = obterDatasDaSemana();
-    
-    // Atualiza o subtítulo com o período (ex: 12/08 a 16/08)
     periodoSemana.innerText = `${datasDaSemana[0]} até ${datasDaSemana[4]}`;
     
-    // Pega 5 refeições aleatórias da constante refeicoesPreDefinidas (do data.js)
-    const refeicoesEscolhidas = embaralharArray(refeicoesPreDefinidas).slice(0, 5);
+    // 1. Sorteia 1 de cada categoria principal
+    const massaEscolhida = pegarAleatorios(refeicoes.massa, 1)[0];
+    const frangoEscolhido = pegarAleatorios(refeicoes.frango, 1)[0];
+    const carneEscolhida = pegarAleatorios(refeicoes.carne, 1)[0];
+    const outrosEscolhido = pegarAleatorios(refeicoes.outros, 1)[0];
 
-    // Gera os cards estilo calendário
+    // 2. Sorteia o 5º dia (não pode ser massa). 
+    // Junta as opções restantes de frango, carne e outros para não repetir o mesmo prato exato.
+    const itensRestantesParaOQuintoDia = [
+        ...refeicoes.frango.filter(item => item !== frangoEscolhido),
+        ...refeicoes.carne.filter(item => item !== carneEscolhida),
+        ...refeicoes.outros.filter(item => item !== outrosEscolhido)
+    ];
+    
+    const pratoExtra = pegarAleatorios(itensRestantesParaOQuintoDia, 1)[0];
+
+    // 3. Junta os 5 pratos escolhidos
+    const cardapioSelecionado = [massaEscolhida, frangoEscolhido, carneEscolhida, outrosEscolhido, pratoExtra];
+
+    // 4. Embaralha tudo para que os pratos caiam em dias aleatórios na semana
+    const refeicoesParaSemana = pegarAleatorios(cardapioSelecionado, 5);
+
+    // Gera os cards no HTML
     nomesDias.forEach((diaNome, index) => {
         const card = document.createElement('div');
         card.className = 'dia-card';
@@ -62,7 +76,7 @@ btnGerar.addEventListener('click', () => {
                 <span class="dia-semana">${diaNome}</span>
                 <span class="dia-numero">${datasDaSemana[index]}</span>
             </div>
-            <div class="dia-comida">${refeicoesEscolhidas[index]}</div>
+            <div class="dia-comida">${refeicoesParaSemana[index]}</div>
         `;
         
         gridDias.appendChild(card);
@@ -74,7 +88,7 @@ btnGerar.addEventListener('click', () => {
 // Impressão
 btnImprimir.addEventListener('click', () => window.print());
 
-// Exportar pro WhatsApp via html2canvas
+// Exportar pro WhatsApp
 btnWhatsapp.addEventListener('click', async () => {
     const planilha = document.getElementById('planilha-semana');
     const textoOriginal = btnWhatsapp.innerText;
