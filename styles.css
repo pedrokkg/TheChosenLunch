@@ -209,6 +209,11 @@ button:active {
     #btn-gerar, .acoes { 
         display: none !important; 
     }
+
+    /* Esconde os botões e o rodapé na hora de imprimir */
+    #btn-gerar, .acoes, footer, #btn-editar { 
+        display: none !important; 
+    }
     
     /* Ajusta o Header (Título e Robô) para ocupar bem o topo horizontal */
     header {
@@ -263,4 +268,44 @@ footer {
     letter-spacing: 1px;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Sombra leve para leitura */
     opacity: 0.9;
+}
+
+/* Estilo do botão de Editar */
+.btn-editar {
+    background-color: #f4a261; /* Cor laranja amigável */
+    color: white;
+}
+
+/* Efeitos para quando o modo de edição estiver ativado */
+.modo-edicao .dia-comida {
+    cursor: text; /* Muda o cursor para indicar que pode digitar */
+    background-color: #fff3cd;
+    border: 1px dashed #f4a261;
+    border-radius: 8px;
+    transition: background-color 0.2s, outline 0.2s;
+    outline: none; /* Remove a borda padrão do navegador */
+}
+
+.modo-edicao .dia-comida:hover {
+    background-color: #ffe69c;
+}
+
+/* Efeito quando você clica para digitar */
+.modo-edicao .dia-comida:focus {
+    background-color: #ffffff;
+    border: 1px solid #e07a5f;
+    box-shadow: 0 0 5px rgba(224, 122, 95, 0.3);
+}
+
+/* O lapisinho */
+.modo-edicao .dia-comida::after {
+    content: " ✏️";
+    font-size: 0.8rem;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Esconde o lapisinho enquanto você estiver digitando para não atrapalhar */
+.modo-edicao .dia-comida:focus::after {
+    display: none;
 }

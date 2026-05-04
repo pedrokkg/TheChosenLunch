@@ -4,11 +4,12 @@ const areaCardapio = document.getElementById('area-cardapio');
 const gridDias = document.getElementById('grid-dias');
 const btnImprimir = document.getElementById('btn-imprimir');
 const btnWhatsapp = document.getElementById('btn-whatsapp');
+const btnEditar = document.getElementById('btn-editar');
 const periodoSemana = document.getElementById('periodo-semana');
 
 const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+let modoEdicao = false; 
 
-// Função para descobrir as datas da semana
 function obterDatasDaSemana() {
     const hoje = new Date();
     const diaDaSemana = hoje.getDay(); 
@@ -28,7 +29,6 @@ function obterDatasDaSemana() {
     return datas;
 }
 
-// Função para embaralhar e pegar itens
 function pegarAleatorios(array, quantidade) {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -41,17 +41,16 @@ function pegarAleatorios(array, quantidade) {
 btnGerar.addEventListener('click', () => {
     gridDias.innerHTML = '';
     
+    if (modoEdicao) alternarModoEdicao();
+    
     const datasDaSemana = obterDatasDaSemana();
     periodoSemana.innerText = `${datasDaSemana[0]} até ${datasDaSemana[4]}`;
     
-    // 1. Sorteia 1 de cada categoria principal
     const massaEscolhida = pegarAleatorios(refeicoes.massa, 1)[0];
     const frangoEscolhido = pegarAleatorios(refeicoes.frango, 1)[0];
     const carneEscolhida = pegarAleatorios(refeicoes.carne, 1)[0];
     const outrosEscolhido = pegarAleatorios(refeicoes.outros, 1)[0];
 
-    // 2. Sorteia o 5º dia (não pode ser massa). 
-    // Junta as opções restantes de frango, carne e outros para não repetir o mesmo prato exato.
     const itensRestantesParaOQuintoDia = [
         ...refeicoes.frango.filter(item => item !== frangoEscolhido),
         ...refeicoes.carne.filter(item => item !== carneEscolhida),
@@ -59,14 +58,9 @@ btnGerar.addEventListener('click', () => {
     ];
     
     const pratoExtra = pegarAleatorios(itensRestantesParaOQuintoDia, 1)[0];
-
-    // 3. Junta os 5 pratos escolhidos
     const cardapioSelecionado = [massaEscolhida, frangoEscolhido, carneEscolhida, outrosEscolhido, pratoExtra];
-
-    // 4. Embaralha tudo para que os pratos caiam em dias aleatórios na semana
     const refeicoesParaSemana = pegarAleatorios(cardapioSelecionado, 5);
 
-    // Gera os cards no HTML
     nomesDias.forEach((diaNome, index) => {
         const card = document.createElement('div');
         card.className = 'dia-card';
@@ -76,6 +70,7 @@ btnGerar.addEventListener('click', () => {
                 <span class="dia-semana">${diaNome}</span>
                 <span class="dia-numero">${datasDaSemana[index]}</span>
             </div>
+            <!-- O prato é inserido aqui limpo, sem o evento de clique antigo -->
             <div class="dia-comida">${refeicoesParaSemana[index]}</div>
         `;
         
@@ -85,11 +80,47 @@ btnGerar.addEventListener('click', () => {
     areaCardapio.classList.remove('escondido');
 });
 
+// Nova lógica de ligar/desligar edição na própria tela
+function alternarModoEdicao() {
+    modoEdicao = !modoEdicao;
+    const camposComida = document.querySelectorAll('.dia-comida');
+
+    if (modoEdicao) {
+        btnEditar.innerText = '✅ Concluir Edição';
+        btnEditar.style.backgroundColor = '#2a9d8f'; 
+        gridDias.classList.add('modo-edicao'); 
+        
+        // Ativa a digitação em todos os dias
+        camposComida.forEach(campo => {
+            campo.setAttribute('contenteditable', 'true');
+        });
+    } else {
+        btnEditar.innerText = '✏️ Editar Cardápio';
+        btnEditar.style.backgroundColor = ''; 
+        gridDias.classList.remove('modo-edicao');
+        
+        // Desativa a digitação e limpa espaços vazios
+        camposComida.forEach(campo => {
+            campo.removeAttribute('contenteditable');
+            if(campo.innerText.trim() === "") {
+                campo.innerText = "Receita não definida"; // Previne que o dia fique vazio se apagar tudo
+            }
+        });
+    }
+}
+
+btnEditar.addEventListener('click', alternarModoEdicao);
+
 // Impressão
-btnImprimir.addEventListener('click', () => window.print());
+btnImprimir.addEventListener('click', () => {
+    if (modoEdicao) alternarModoEdicao(); // Desliga a edição antes de imprimir
+    window.print();
+});
 
 // Exportar pro WhatsApp
 btnWhatsapp.addEventListener('click', async () => {
+    if (modoEdicao) alternarModoEdicao(); // Desliga a edição antes de gerar imagem
+
     const planilha = document.getElementById('planilha-semana');
     const textoOriginal = btnWhatsapp.innerText;
     btnWhatsapp.innerText = '⏳ Gerando imagem...';
