@@ -28,6 +28,7 @@ const refeicoes = {
         "Arroz, feijão, farofa e linguiça",
         "Batata Rostie",
         "Kibe de forno recheado com queijo",
-        "Hambúrguer caseiro com batatas"
+        "Hambúrguer caseiro com batatas",
+        "Peixe com batatas"
     ]
 };

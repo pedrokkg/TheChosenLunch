@@ -4,11 +4,12 @@ const areaCardapio = document.getElementById('area-cardapio');
 const gridDias = document.getElementById('grid-dias');
 const btnImprimir = document.getElementById('btn-imprimir');
 const btnWhatsapp = document.getElementById('btn-whatsapp');
+const btnEditar = document.getElementById('btn-editar');
 const periodoSemana = document.getElementById('periodo-semana');
 
 const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+let modoEdicao = false; 
 
-// Função para descobrir as datas da semana
 function obterDatasDaSemana() {
     const hoje = new Date();
     const diaDaSemana = hoje.getDay(); 
@@ -28,7 +29,6 @@ function obterDatasDaSemana() {
     return datas;
 }
 
-// Função para embaralhar e pegar itens
 function pegarAleatorios(array, quantidade) {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -38,20 +38,29 @@ function pegarAleatorios(array, quantidade) {
     return arr.slice(0, quantidade);
 }
 
+// Junta todas as categorias para a roleta individual
+function obterTodasRefeicoes() {
+    return [
+        ...refeicoes.frango,
+        ...refeicoes.carne,
+        ...refeicoes.massa,
+        ...refeicoes.outros
+    ];
+}
+
 btnGerar.addEventListener('click', () => {
     gridDias.innerHTML = '';
+    
+    if (modoEdicao) alternarModoEdicao();
     
     const datasDaSemana = obterDatasDaSemana();
     periodoSemana.innerText = `${datasDaSemana[0]} até ${datasDaSemana[4]}`;
     
-    // 1. Sorteia 1 de cada categoria principal
     const massaEscolhida = pegarAleatorios(refeicoes.massa, 1)[0];
     const frangoEscolhido = pegarAleatorios(refeicoes.frango, 1)[0];
     const carneEscolhida = pegarAleatorios(refeicoes.carne, 1)[0];
     const outrosEscolhido = pegarAleatorios(refeicoes.outros, 1)[0];
 
-    // 2. Sorteia o 5º dia (não pode ser massa). 
-    // Junta as opções restantes de frango, carne e outros para não repetir o mesmo prato exato.
     const itensRestantesParaOQuintoDia = [
         ...refeicoes.frango.filter(item => item !== frangoEscolhido),
         ...refeicoes.carne.filter(item => item !== carneEscolhida),
@@ -59,14 +68,9 @@ btnGerar.addEventListener('click', () => {
     ];
     
     const pratoExtra = pegarAleatorios(itensRestantesParaOQuintoDia, 1)[0];
-
-    // 3. Junta os 5 pratos escolhidos
     const cardapioSelecionado = [massaEscolhida, frangoEscolhido, carneEscolhida, outrosEscolhido, pratoExtra];
-
-    // 4. Embaralha tudo para que os pratos caiam em dias aleatórios na semana
     const refeicoesParaSemana = pegarAleatorios(cardapioSelecionado, 5);
 
-    // Gera os cards no HTML
     nomesDias.forEach((diaNome, index) => {
         const card = document.createElement('div');
         card.className = 'dia-card';
@@ -77,19 +81,73 @@ btnGerar.addEventListener('click', () => {
                 <span class="dia-numero">${datasDaSemana[index]}</span>
             </div>
             <div class="dia-comida">${refeicoesParaSemana[index]}</div>
+            <!-- Botão da roleta adicionado com a tag para o html2canvas ignorar -->
+            <button class="btn-roleta" data-html2canvas-ignore="true" title="Sortear outro prato">🔄</button>
         `;
         
+        // --- NOVA LÓGICA DA ROLETA INDIVIDUAL ---
+        const btnRoleta = card.querySelector('.btn-roleta');
+        const divComida = card.querySelector('.dia-comida');
+        
+        btnRoleta.addEventListener('click', () => {
+            if(modoEdicao) return; // Não roda a roleta se estiver editando o texto
+            
+            const todas = obterTodasRefeicoes();
+            const pratosNaTela = Array.from(document.querySelectorAll('.dia-comida')).map(el => el.innerText);
+            
+            // Garante que a roleta não vai sortear um prato que já está nos outros dias
+            const disponiveis = todas.filter(prato => !pratosNaTela.includes(prato));
+            
+            if (disponiveis.length > 0) {
+                divComida.innerText = pegarAleatorios(disponiveis, 1)[0];
+            } else {
+                divComida.innerText = pegarAleatorios(todas, 1)[0];
+            }
+        });
+
         gridDias.appendChild(card);
     });
 
     areaCardapio.classList.remove('escondido');
 });
 
-// Impressão
-btnImprimir.addEventListener('click', () => window.print());
+function alternarModoEdicao() {
+    modoEdicao = !modoEdicao;
+    const camposComida = document.querySelectorAll('.dia-comida');
+    const botoesRoleta = document.querySelectorAll('.btn-roleta');
 
-// Exportar pro WhatsApp
+    if (modoEdicao) {
+        btnEditar.innerText = '✅ Concluir Edição';
+        btnEditar.style.backgroundColor = '#2a9d8f'; 
+        gridDias.classList.add('modo-edicao'); 
+        
+        camposComida.forEach(campo => campo.setAttribute('contenteditable', 'true'));
+        // Esconde as roletas enquanto edita para não atrapalhar
+        botoesRoleta.forEach(btn => btn.style.display = 'none');
+    } else {
+        btnEditar.innerText = '✏️ Editar Cardápio';
+        btnEditar.style.backgroundColor = ''; 
+        gridDias.classList.remove('modo-edicao');
+        
+        camposComida.forEach(campo => {
+            campo.removeAttribute('contenteditable');
+            if(campo.innerText.trim() === "") campo.innerText = "Receita não definida";
+        });
+        // Volta a mostrar as roletas
+        botoesRoleta.forEach(btn => btn.style.display = 'flex');
+    }
+}
+
+btnEditar.addEventListener('click', alternarModoEdicao);
+
+btnImprimir.addEventListener('click', () => {
+    if (modoEdicao) alternarModoEdicao(); 
+    window.print();
+});
+
 btnWhatsapp.addEventListener('click', async () => {
+    if (modoEdicao) alternarModoEdicao(); 
+
     const planilha = document.getElementById('planilha-semana');
     const textoOriginal = btnWhatsapp.innerText;
     btnWhatsapp.innerText = '⏳ Gerando imagem...';
